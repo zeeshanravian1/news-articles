@@ -17,6 +17,9 @@ from typing import Any
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR: Path = Path(__file__).resolve().parent.parent
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -34,7 +37,18 @@ ALLOWED_HOSTS: list[Any] = []
 
 # Application definition
 
+REST_FRAMEWORK: dict[str, list[str]] = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ]
+}
+
 INSTALLED_APPS: list[str] = [
+    "rest_framework",
+    "news",
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,6 +56,17 @@ INSTALLED_APPS: list[str] = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+
+# Configure channel layer, this example assumes Redis as a backend.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 MIDDLEWARE: list[str] = [
     "django.middleware.security.SecurityMiddleware",
@@ -72,6 +97,8 @@ TEMPLATES: list[dict[str, Any]] = [
 ]
 
 WSGI_APPLICATION = "news_articles.wsgi.application"
+
+ASGI_APPLICATION = "news_articles.asgi.application"
 
 
 # Database
